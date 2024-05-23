@@ -1,18 +1,21 @@
 import { createBookElement, createOptionElement } from "./utils/helper.js";
+// Importing utility functions `createBookElement` and `createOptionElement` from the helper module.
+
 import { books, authors, genres, BOOKS_PER_PAGE } from "./data.js";
+// Importing data arrays `books`, `authors`, `genres`, and a constant `BOOKS_PER_PAGE` from the data module.
 
 let page = 1;
 let matches = books;
+// Initializing the current page number to 1 and setting the matches to the entire books array.
 
-// Initial setup function
 function initialize() {
   createBookList();
   createOptionLists();
   checkAndSetTheme();
   updateShowMoreButton();
 }
+// Main initialization function that calls other functions to set up the initial state of the application.
 
-// Function to create the initial book list
 function createBookList() {
   const starting = document.createDocumentFragment();
   const initialBooks = matches
@@ -22,22 +25,23 @@ function createBookList() {
     );
   appendElements(starting, "[data-list-items]", initialBooks);
 }
+// Creates the initial book list using a document fragment for efficient DOM manipulation.
+// It slices the matches array to get the first page of books and maps each book to a book element.
 
-// Function to create option lists for genres and authors
 function createOptionLists() {
   const genreHtml = createOptionElement(genres, "All Genres");
   const authorHtml = createOptionElement(authors, "All Authors");
   appendElements(genreHtml, "[data-search-genres]");
   appendElements(authorHtml, "[data-search-authors]");
 }
+// Creates the option lists for genres and authors and appends them to the corresponding elements in the DOM.
 
-// Function to append elements to the DOM
 function appendElements(fragment, selector, elements = []) {
   elements.forEach((element) => fragment.appendChild(element));
   document.querySelector(selector).appendChild(fragment);
 }
+// A utility function to append a list of elements to a specified DOM element identified by the selector.
 
-// Function to set theme colors
 function setThemeColors(theme) {
   const colors = {
     darkColor: theme === "night" ? "255, 255, 255" : "10, 10, 20",
@@ -48,8 +52,8 @@ function setThemeColors(theme) {
   document.documentElement.style.setProperty("--color-dark", darkColor);
   document.documentElement.style.setProperty("--color-light", lightColor);
 }
+// Sets the theme colors based on the provided theme (either "night" or "day") by updating CSS custom properties.
 
-// Function to check and set theme
 function checkAndSetTheme() {
   const theme =
     window.matchMedia &&
@@ -58,16 +62,15 @@ function checkAndSetTheme() {
       : "day";
   setThemeColors(theme);
 }
+// Checks the user's preferred color scheme and sets the theme colors accordingly.
 
-// Function to update "Show more" button text and disabled state
 function updateShowMoreButton() {
   const remainingBooks = Math.max(books.length - BOOKS_PER_PAGE, 0);
   const listButton = document.querySelector("[data-list-button]");
   listButton.innerText = `Show more (${remainingBooks})`;
-  listButton.disabled = matches.length - page * BOOKS_PER_PAGE > 0;
 }
+// Updates the "Show more" button text to indicate the number of remaining books and disables the button if necessary.
 
-// Event listeners setup function
 function setupEventListeners() {
   document
     .querySelector("[data-search-cancel]")
@@ -114,8 +117,9 @@ function setupEventListeners() {
     .querySelector("[data-list-items]")
     .addEventListener("click", handleListItemClick);
 }
+// Sets up various event listeners for handling user interactions with the search and settings overlays,
+// list item clicks, and form submissions.
 
-// Event handlers
 function handleSettingsFormSubmit(event) {
   event.preventDefault();
   const formData = new FormData(event.target);
@@ -125,6 +129,7 @@ function handleSettingsFormSubmit(event) {
 
   document.querySelector("[data-settings-overlay]").open = false;
 }
+// Handles the settings form submission to update the theme colors based on the selected theme.
 
 function handleSearchFormSubmit(event) {
   event.preventDefault();
@@ -134,6 +139,7 @@ function handleSearchFormSubmit(event) {
 
   updateBookList(result);
 }
+// Handles the search form submission to filter books based on the provided search criteria and updates the book list.
 
 function handleShowMoreButtonClick() {
   const fragment = document.createDocumentFragment();
@@ -148,6 +154,8 @@ function handleShowMoreButtonClick() {
   appendElements(fragment, "[data-list-items]", additionalBooks);
   page += 1;
 }
+// Handles the "Show more" button click to load and display more books.
+// It calculates the start and end indices for the next set of books and appends them to the list.
 
 function handleListItemClick(event) {
   const pathArray = Array.from(event.path || event.composedPath());
@@ -165,8 +173,8 @@ function handleListItemClick(event) {
     showActiveBook(active);
   }
 }
+// Handles clicks on the book list items. It identifies the clicked book by traversing the event path and displays its details.
 
-// Function to apply search filters
 function applyFilters(filters) {
   return books.filter((book) => {
     let genreMatch = filters.genre === "any";
@@ -186,8 +194,8 @@ function applyFilters(filters) {
     );
   });
 }
+// Filters the books based on the provided filters for title, author, and genre.
 
-// Function to update the book list based on filtered results
 function updateBookList(result) {
   page = 1;
   matches = result;
@@ -203,13 +211,14 @@ function updateBookList(result) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   document.querySelector("[data-search-overlay]").open = false;
 }
+// Updates the book list with the filtered results. It resets the page number, updates the matches,
+// and recreates the book list. It also handles the display of a message if no results are found.
 
-// Function to find active book by ID
 function findActiveBook(id) {
   return books.find((book) => book.id === id);
 }
+// Finds and returns the active book based on its ID.
 
-// Function to show details of active book
 function showActiveBook(active) {
   document.querySelector("[data-list-active]").open = true;
   document.querySelector("[data-list-blur]").src = active.image;
@@ -221,7 +230,8 @@ function showActiveBook(active) {
   document.querySelector("[data-list-description]").innerText =
     active.description;
 }
+// Displays the details of the active book in the overlay by updating the corresponding DOM elements with the book's information.
 
-// Call the initialization function and setup event listeners
 initialize();
 setupEventListeners();
+// Calls the initialization function and sets up event listeners when the script is loaded.
